@@ -49,14 +49,14 @@ public class SampleTest {
 
     @Test
     public void testChangeTextForEmpty() {
-        var InitialText = driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
-        MobileElement el1 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/userInput"));
-        el1.click();
-        el1.sendKeys(TextToSet1);
-        MobileElement el2 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/buttonChange"));
+        MobileElement el1 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
+        MobileElement el2 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/userInput"));
         el2.click();
-        MobileElement el3 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
-        Assertions.assertEquals(InitialText.getText(), el3.getText());
+        el2.sendKeys(TextToSet1);
+        MobileElement el3 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/buttonChange"));
+        el3.click();
+        MobileElement el4 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
+        Assertions.assertEquals(el1.getText(), el4.getText());
     }
 
     @Test
