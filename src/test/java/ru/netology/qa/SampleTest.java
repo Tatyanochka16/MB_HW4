@@ -1,5 +1,6 @@
 package ru.netology.qa;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.MobileSelector;
 import io.appium.java_client.android.AndroidDriver;
@@ -17,9 +18,16 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
 
+import ru.netology.qa.MobileObjects;
+
 public class SampleTest {
 
-    private AndroidDriver driver;
+    enum Platform {Android, iOS}
+
+    ;
+    Platform platform = Platform.Android;
+    private AppiumDriver driver;
+    private MobileObjects mobileObjects;
     private String TextToSet1 = "   ";
     private String TextToSet2 = "New Text";
 
@@ -35,41 +43,48 @@ public class SampleTest {
     @BeforeEach
     public void setUp() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-        desiredCapabilities.setCapability("platformName", "android");
-        desiredCapabilities.setCapability("appium:appPackage", "ru.netology.testing.uiautomator");
-        desiredCapabilities.setCapability("appium:appActivity", ".MainActivity");
-        desiredCapabilities.setCapability("appium:automationName", "uiautomator2");
         desiredCapabilities.setCapability("appium:ensureWebviewsHavePages", true);
         desiredCapabilities.setCapability("appium:nativeWebScreenshot", true);
         desiredCapabilities.setCapability("appium:newCommandTimeout", 3600);
         desiredCapabilities.setCapability("appium:connectHardwareKeyboard", true);
 
-        driver = new AndroidDriver(getUrl(), desiredCapabilities);
+        if (platform == Platform.Android) {
+            desiredCapabilities.setCapability("platformName", "android");
+            desiredCapabilities.setCapability("appium:appPackage", "ru.netology.testing.uiautomator");
+            desiredCapabilities.setCapability("appium:appActivity", ".MainActivity");
+            desiredCapabilities.setCapability("appium:automationName", "uiautomator2");
+            driver = new AndroidDriver(getUrl(), desiredCapabilities);
+        } else {
+            throw new IllegalArgumentException(String.format("Platform %s no supported", platform));
+        }
+
+        mobileObjects = new MobileObjects(driver);
     }
 
     @Test
     public void testChangeTextForEmpty() {
-        MobileElement el1 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
-        MobileElement el2 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/userInput"));
-        el2.click();
-        el2.sendKeys(TextToSet1);
-        MobileElement el3 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/buttonChange"));
-        el3.click();
-        MobileElement el4 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/textToBeChanged"));
-        Assertions.assertEquals(el1.getText(), el4.getText());
+        if (platform == Platform.Android) {
+            MobileElement initialString = mobileObjects.textString;
+            mobileObjects.inputString.click();
+            mobileObjects.inputString.sendKeys(TextToSet1);
+            mobileObjects.buttonChange.click();
+            Assertions.assertEquals(initialString.getText(), mobileObjects.textString.getText());
+        } else {
+            throw new IllegalArgumentException(String.format("Platform %s no supported", platform));
+        }
     }
 
     @Test
     public void testChangeTextForActivity() {
-
-        MobileElement el1 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/userInput"));
-        el1.click();
-        el1.sendKeys(TextToSet2);
-        MobileElement el2 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/buttonActivity"));
-        el2.click();
-        MobileElement el3 = (MobileElement) driver.findElement(By.id("ru.netology.testing.uiautomator:id/text"));
-        el3.isDisplayed();
-        Assertions.assertEquals(el3.getText(), TextToSet2);
+        if (platform == Platform.Android) {
+            mobileObjects.inputString.click();
+            mobileObjects.inputString.sendKeys(TextToSet2);
+            mobileObjects.buttonActivity.click();
+            mobileObjects.textActivity.isDisplayed();
+            Assertions.assertEquals(mobileObjects.textActivity.getText(), TextToSet2);
+        } else {
+            throw new IllegalArgumentException(String.format("Platform %s no supported", platform));
+        }
     }
 
     @AfterEach
